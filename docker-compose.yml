@@ -1,0 +1,84 @@
+version : "1"
+services:
+  dev-kit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dev-kit
+    depends_on:
+      - dev-kit-pg
+    volumes:
+      - .:/var/www/html
+    restart: always
+    ports:
+      - "1414:80"
+    environment:
+      APP_NAME: "Dev Kit"
+    networks:
+      dev-kit-network:
+        ipv4_address: 14.14.1.1
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  dev-kit-pg:
+    image: postgres:latest
+    container_name: dev-kit-pg
+    volumes:
+      - dev-kit-pg-disk:/var/lib/postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: testing
+    networks:
+      dev-kit-network:
+        ipv4_address: 14.14.1.2
+
+  dev-kit-q:
+    build:
+      context: .
+      dockerfile: QueueListener.Dockerfile
+    container_name: dev-kit-q
+    depends_on:
+      - dev-kit
+    volumes:
+      - .:/var/www/html
+    restart: unless-stopped
+    networks:
+      dev-kit-network:
+        ipv4_address: 14.14.1.3
+
+  dev-kit-mailpit:
+    image: 'axllent/mailpit:latest'
+    container_name: dev-kit-mailpit
+    restart: always
+    networks:
+      dev-kit-network:
+        ipv4_address: 14.14.1.4
+
+#  dev-kit-vite:
+#      build:
+#          context: .
+#          dockerfile: Vite.Dockerfile
+#      container_name: dev-kit-vite
+#      ports:
+#        - "2101:5173"
+#      depends_on:
+#          - dev-kit
+#      volumes:
+#          - .:/var/www/html
+#      restart: unless-stopped
+#      networks:
+#          dev-kit-network:
+#              ipv4_address: 14.14.1.5
+
+# On-disk storage of DB data, when containers are stopped
+volumes:
+  dev-kit-pg-disk: {}
+
+# Local network for services running using this docker-compose config
+networks:
+  dev-kit-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 14.14.0.0/16
