@@ -1,0 +1,104 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'Sample API'
+  description: Buy or rent spacecrafts
+
+servers:
+  - url: http://44.63.1.1/api/v1
+
+paths:
+  /spacecrafts/{spacecraftId}:
+    parameters:
+      - name: spacecraftId
+        description: The unique identifier of the spacecraft
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SpacecraftId'
+    get:
+      summary: Read a spacecraft
+      responses:
+        '200':
+          description: The spacecraft corresponding to the provided `spacecraftId`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Spacecraft'
+        404:
+          description: No spacecraft found for the provided `spacecraftId`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  x-scripts:
+    HelloLogger:
+      description: console.log("hello")
+      type: function
+  x-tests:
+    StatusOkTest:
+      description: pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      type: function
+    ContentTypeJsonTest:
+      description: pm.test('Response has JSON content type', function () { pm.response.to.have.header('Content-Type', 'application/json'); });
+      type: function  
+    NotEmptyTest:
+      description: pm.test('Not Empty', function () { pm.response.to.have.jsonBody(data); });
+      type: function
+    ErrorResponseFormatTest:
+      description: pm.test('Error response has a proper format', function () { pm.response.to.have.jsonBody(body);});
+      type: function
+    CustomTest:
+      description: pm.test('message', function () { testBody });
+      type: function
+  x-functions:
+    Incrementer:
+      description: (y)=>y+1
+      type: function
+  schemas:
+    SpacecraftId:
+      description: The unique identifier of a spacecraft
+      type: string
+    Spacecraft:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          $ref: '#/components/schemas/SpacecraftId'
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - capsule
+            - probe
+            - satellite
+            - spaceplane
+            - station
+        description:
+          type: string
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human-readable error message
+          type: string
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+security:
+  - ApiKey: []
