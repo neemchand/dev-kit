@@ -1,18 +1,28 @@
-name: Docker Image CI
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    paths:
+      - '**/.php'
+      - '**/.yml'
+      - '**/.json'
+      - '.env.*'
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
-
-  build:
-
+  CI:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - uses: actions/checkout@v2
+      - name: Docker Compose
+        run: docker-compose -f docker-compose.yml up -d
+
+      - name: CI checks
+        run: docker-compose -f docker-compose.yml exec -T dev-kit-api composer run ci
+      - name: Setup dev environment
+        run: docker-compose -f docker-compose.yml exec -T dev-kit-api composer run dev
+      - name: Postman tests
+        run: docker-compose -f docker-compose.yml exec -T dev-kit-api postman collection run postman/ci-collection.json
