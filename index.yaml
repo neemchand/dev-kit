@@ -50,7 +50,7 @@ components:
       description: pm.test('Response has JSON content type', function () { pm.response.to.have.header('Content-Type', 'application/json'); });
       type: function  
     NotEmptyTest:
-      description: pm.test('Not Empty', function () { pm.response.to.have.jsonBody(data); });
+      description: pm.test('Not Empty test', function () { pm.response.to.have.jsonBody(data); });
       type: function
     ErrorResponseFormatTest:
       description: pm.test('Error response has a proper format', function () { pm.response.to.have.jsonBody(body);});
