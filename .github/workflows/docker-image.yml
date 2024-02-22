@@ -21,6 +21,6 @@ jobs:
         run: docker-compose -f docker-compose.yml up -d
 
       - name: Setup dev environment
-        run: docker-compose exec -T dev-kit-api composer run dev
+        run: docker-compose exec -T dev-kit composer run dev
       - name: Postman tests
         run: docker-compose exec -T dev-kit-api postman collection run postman/ci-collection.json
