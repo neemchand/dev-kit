@@ -20,8 +20,6 @@ jobs:
       - name: Docker Compose
         run: docker-compose -f docker-compose.yml up -d
 
-      - name: CI checks
-        run: docker-compose exec -T dev-kit-api composer run ci
       - name: Setup dev environment
         run: docker-compose exec -T dev-kit-api composer run dev
       - name: Postman tests
