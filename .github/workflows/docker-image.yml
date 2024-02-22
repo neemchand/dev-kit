@@ -16,11 +16,11 @@ jobs:
   CI:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Docker Compose
         run: docker-compose -f docker-compose.yml up -d
 
       - name: Setup dev environment
         run: docker-compose exec -T dev-kit composer run dev
       - name: Postman tests
-        run: docker-compose exec -T dev-kit-api postman collection run postman/ci-collection.json
+        run: docker-compose exec -T dev-kit postman collection run postman/ci-collection.json
